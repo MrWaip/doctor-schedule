@@ -1,19 +1,34 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import { Toolbar, Container, AppBar, Button, CssBaseline } from '@material-ui/core';
+import { Schedule } from './pages/Schedule';
+import { Registration } from './pages/Registration';
+import './styles/App.scss';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <CssBaseline />
+      <Router>
+        <AppBar position="static">
+          <Toolbar>
+            <Button color="inherit" component={Link} to="/">
+              Запись на прием
+            </Button>
+            <Button color="inherit" component={Link} to="/schedule">
+              Расписание
+            </Button>
+          </Toolbar>
+        </AppBar>
+        <Container maxWidth="lg" className="app__content">
+          <Route path="/" exact>
+            <Registration />
+          </Route>
+          <Route path="/schedule" exact>
+            <Schedule />
+          </Route>
+        </Container>
+      </Router>
     </div>
   );
 }
