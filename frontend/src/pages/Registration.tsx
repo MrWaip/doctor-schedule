@@ -6,32 +6,9 @@ import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import { useForm, Controller } from 'react-hook-form';
 import { client } from '../plugins/axios';
+import { RegForm, Loading, Doctor, Time } from '../types';
 
-export type Doctor = {
-  id: number;
-  full_name: string;
-};
-
-export type Time = {
-  id: number;
-  start: string;
-  humanVariant: string;
-  allowed: boolean;
-};
-
-type Loading = {
-  doctors: boolean;
-  times: boolean;
-};
-
-interface IRegForm {
-  doctor: Doctor | null;
-  time: Time | null;
-  patient: string;
-  complaints: string;
-}
-
-const defaultValues: IRegForm = {
+const defaultValues: RegForm = {
   complaints: '',
   doctor: null,
   time: null,
@@ -82,9 +59,9 @@ const Registration = () => {
     fetchDoctors();
   }, []);
 
-  const { register, handleSubmit, errors, control } = useForm<IRegForm>({ defaultValues });
+  const { register, handleSubmit, errors, control } = useForm<RegForm>({ defaultValues });
 
-  const onSubmit = async (data: IRegForm) => {
+  const onSubmit = async (data: RegForm) => {
     await client.post('schedule', data);
   };
 

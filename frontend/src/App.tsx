@@ -12,12 +12,14 @@ function App() {
       <Router>
         <AppBar position="static">
           <Toolbar>
-            <Button color="inherit" component={Link} to="/">
-              Запись на прием
-            </Button>
-            <Button color="inherit" component={Link} to="/schedule">
-              Расписание
-            </Button>
+            <Container maxWidth="lg">
+              <Button color="inherit" component={Link} to="/">
+                Запись на прием
+              </Button>
+              <Button color="inherit" component={Link} to="/schedule">
+                Расписание
+              </Button>
+            </Container>
           </Toolbar>
         </AppBar>
         <Container maxWidth="lg" className="app__content">

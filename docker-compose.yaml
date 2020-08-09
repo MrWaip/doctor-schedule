@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  nginx:
+    image: nginx:alpine
+    restart: always
+    volumes:
+      - ./dist:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    ports:
+      - 3000:80
+
+  backend:
+    image: node:alpine
+    restart: always
+    volumes:
+      - ./backend:/var/www
+    ports:
+      - 3080:3000
+    links:
+      - db
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: med_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - 7433:5432
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+
+volumes:
+  dbdata:

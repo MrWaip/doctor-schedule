@@ -15,30 +15,12 @@ import {
 } from '@material-ui/core';
 import '../styles/Schedule.scss';
 import { Delete } from '@material-ui/icons';
-import { Doctor } from './Registration';
 import { useForm, Controller } from 'react-hook-form';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { client } from '../plugins/axios';
-
-export type ScheduleRecord = {
-  id: number;
-  patient_name: string;
-  time: string;
-  complaints: string;
-  completed: boolean;
-};
-
-export type Date = {
-  humanVariant: string;
-  value: string;
-};
-
-export type SearchForm = {
-  doctor: Doctor | null;
-  date: Date | null;
-};
+import { SearchForm, Date, Doctor, ScheduleRecord } from '../types';
 
 const defaultValues: SearchForm = {
   doctor: null,
