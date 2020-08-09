@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
-import * as Koa from 'koa';
-import * as Router from 'koa-router';
-import * as bodyParser from 'koa-bodyparser';
+import Koa from 'koa';
+import Router from 'koa-router';
+import bodyParser from 'koa-bodyparser';
 import { ApiRoutes } from './routes';
-import * as koaLogger from 'koa-logger';
+import koaLogger from 'koa-logger';
 
 createConnection()
   .then(async () => {

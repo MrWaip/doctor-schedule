@@ -16,6 +16,7 @@
     "typescript": "3.3.3333"
   },
   "dependencies": {
+    "@types/faker": "^4.1.12",
     "@types/koa-logger": "^3.1.1",
     "koa": "^2.5.0",
     "koa-bodyparser": "^4.2.0",
@@ -24,13 +25,16 @@
     "mysql": "^2.15.0",
     "pg": "^7.3.0",
     "reflect-metadata": "^0.1.10",
-    "typeorm": "0.2.25"
+    "typeorm": "0.2.25",
+    "typeorm-seeding": "^1.6.1"
   },
   "scripts": {
     "start": "ts-node src/index.ts",
     "lint": "tsc --noEmit && eslint \"**/*.{js,ts}\" --quiet --fix",
     "typeorm:cli": "ts-node ./node_modules/typeorm/cli -f ./ormconfig.json",
     "migration:run": "yarn typeorm:cli migration:run",
-    "migration:revert": "yarn typeorm:cli migration:revert"
+    "migration:revert": "yarn typeorm:cli migration:revert",
+    "seed:config": "ts-node ./node_modules/typeorm-seeding/dist/cli.js config",
+    "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed"
   }
 }
