@@ -42,18 +42,9 @@ const Registration = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       setLoading({ ...loading, doctors: true });
-      return new Promise((resolve) =>
-        setTimeout(() => {
-          setDoctors([
-            {
-              full_name: 'Иванов Иван Иванович',
-              id: 1,
-            },
-          ]);
-          setLoading({ ...loading, doctors: false });
-          resolve();
-        }, 4000),
-      );
+      const { data } = await client.get<Doctor[]>('doctors');
+      setLoading({ ...loading, doctors: false });
+      setDoctors(data);
     };
 
     fetchDoctors();
