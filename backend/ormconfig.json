@@ -1,11 +1,11 @@
 {
    "type": "postgres",
    "host": "localhost",
-   "port": 5432,
-   "username": "test",
-   "password": "test",
-   "database": "test",
-   "synchronize": true,
+   "port": 7433,
+   "username": "admin",
+   "password": "1234",
+   "database": "med_db",
+   "synchronize": false,
    "logging": false,
    "entities": [
       "src/entity/**/*.ts"

@@ -16,8 +16,10 @@
     "typescript": "3.3.3333"
   },
   "dependencies": {
+    "@types/koa-logger": "^3.1.1",
     "koa": "^2.5.0",
     "koa-bodyparser": "^4.2.0",
+    "koa-logger": "^3.2.1",
     "koa-router": "^7.4.0",
     "mysql": "^2.15.0",
     "pg": "^7.3.0",
@@ -26,6 +28,9 @@
   },
   "scripts": {
     "start": "ts-node src/index.ts",
-    "lint": "tsc --noEmit && eslint \"**/*.{js,ts}\" --quiet --fix"
+    "lint": "tsc --noEmit && eslint \"**/*.{js,ts}\" --quiet --fix",
+    "typeorm:cli": "ts-node ./node_modules/typeorm/cli -f ./ormconfig.json",
+    "migration:run": "yarn typeorm:cli migration:run",
+    "migration:revert": "yarn typeorm:cli migration:revert"
   }
 }
