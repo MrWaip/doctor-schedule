@@ -5,6 +5,7 @@ import Router from 'koa-router';
 import bodyParser from 'koa-bodyparser';
 import { ApiRoutes } from './routes';
 import koaLogger from 'koa-logger';
+import cors from '@koa/cors';
 
 createConnection()
   .then(async () => {
@@ -14,6 +15,7 @@ createConnection()
     ApiRoutes.forEach((route) => router[route.method](route.path, route.action));
 
     app.use(bodyParser());
+    app.use(cors());
     app.use(koaLogger());
     app.use(router.routes());
     app.use(router.allowedMethods());
