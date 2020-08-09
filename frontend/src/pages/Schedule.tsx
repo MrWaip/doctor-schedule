@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Typography,
   Button,
@@ -15,8 +15,12 @@ import {
 } from '@material-ui/core';
 import '../styles/Schedule.scss';
 import { Delete } from '@material-ui/icons';
-import { Doctor, Time } from './Registration';
-import { useForm } from 'react-hook-form';
+import { Doctor } from './Registration';
+import { useForm, Controller } from 'react-hook-form';
+import match from 'autosuggest-highlight/match';
+import parse from 'autosuggest-highlight/parse';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import { client } from '../plugins/axios';
 
 export type ScheduleRecord = {
   id: number;
@@ -26,9 +30,14 @@ export type ScheduleRecord = {
   completed: boolean;
 };
 
+export type Date = {
+  humanVariant: string;
+  value: string;
+};
+
 export type SearchForm = {
   doctor: Doctor | null;
-  date: Time | null;
+  date: Date | null;
 };
 
 const defaultValues: SearchForm = {
@@ -47,15 +56,28 @@ const Schedule = () => {
     },
   ];
 
-  const { control, register, errors, handleSubmit } = useForm<SearchForm>({ defaultValues });
+  const { control, errors, handleSubmit } = useForm<SearchForm>({ defaultValues });
 
-  const times: Time[] = [];
-  const doctors: Doctor[] = [];
+  const dates: Date[] = [
+    {
+      value: 'www',
+      humanVariant: 'wqweq',
+    },
+  ];
+  const doctors: Doctor[] = [
+    {
+      full_name: '222',
+      id: 1,
+    },
+  ];
 
-  const [doctor, setDoctor] = useState<Doctor | null>(null);
-  const [time, setTime] = useState<Time | null>(null);
-  const search = (data: SearchForm) => {
-    console.log(data);
+  const search = async (data: SearchForm) => {
+    await client.get('schedule', {
+      params: {
+        date: data.date?.value,
+        doctor: data.doctor?.id,
+      },
+    });
   };
 
   return (
@@ -70,11 +92,85 @@ const Schedule = () => {
 
       <form onSubmit={handleSubmit(search)}>
         <Grid container item xs={12} spacing={1}>
-          <Grid item>
-            <TextField variant="outlined" label="Доктор" size="small" name="doctor" inputRef={register} />
+          <Grid item xs={6} md={3}>
+            <Controller
+              name="doctor"
+              rules={{ required: true }}
+              control={control}
+              render={(props) => (
+                <Autocomplete
+                  {...props}
+                  onChange={(_, doctor) => props.onChange(doctor)}
+                  getOptionSelected={(val, option) => val.id === option.id}
+                  options={doctors}
+                  getOptionLabel={(option) => option.full_name}
+                  size="small"
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      error={!!errors.doctor}
+                      helperText={errors.doctor && 'Вы должы указать доктора'}
+                      label="Доктор"
+                      variant="outlined"
+                    />
+                  )}
+                  renderOption={(option, { inputValue }) => {
+                    const matches = match(option.full_name, inputValue);
+                    const parts = parse(option.full_name, matches);
+
+                    return (
+                      <div>
+                        {parts.map((part, index) => (
+                          <span key={`highlight_${index}`} style={part.highlight ? { background: '#faea2d' } : {}}>
+                            {part.text}
+                          </span>
+                        ))}
+                      </div>
+                    );
+                  }}
+                />
+              )}
+            />
           </Grid>
-          <Grid item>
-            <TextField variant="outlined" label="Дата" size="small" name="date" inputRef={register} />
+          <Grid item xs={6} md={3}>
+            <Controller
+              name="date"
+              rules={{ required: true }}
+              control={control}
+              render={(props) => (
+                <Autocomplete
+                  {...props}
+                  onChange={(_, date) => props.onChange(date)}
+                  getOptionSelected={(date, option) => date.value === option.value}
+                  options={dates}
+                  getOptionLabel={(option) => option.humanVariant}
+                  size="small"
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      error={!!errors.date}
+                      helperText={errors.date && 'Вы должы указать дату'}
+                      label="Дата"
+                      variant="outlined"
+                    />
+                  )}
+                  renderOption={(option, { inputValue }) => {
+                    const matches = match(option.humanVariant, inputValue);
+                    const parts = parse(option.humanVariant, matches);
+
+                    return (
+                      <div>
+                        {parts.map((part, index) => (
+                          <span key={index} style={part.highlight ? { background: '#faea2d' } : {}}>
+                            {part.text}
+                          </span>
+                        ))}
+                      </div>
+                    );
+                  }}
+                />
+              )}
+            />
           </Grid>
           <Grid item>
             <Button variant="contained" color="primary" type="submit">

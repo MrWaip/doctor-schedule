@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Typography, Card, CardContent, TextField, FormControl, Button } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import '../styles/Registration.scss';
@@ -19,6 +19,11 @@ export type Time = {
   allowed: boolean;
 };
 
+type Loading = {
+  doctors: boolean;
+  times: boolean;
+};
+
 interface IRegForm {
   doctor: Doctor | null;
   time: Time | null;
@@ -33,13 +38,14 @@ const defaultValues: IRegForm = {
   patient: '',
 };
 
+const defaultLoading: Loading = {
+  doctors: false,
+  times: false,
+};
+
 const Registration = () => {
-  const doctors: Doctor[] = [
-    {
-      full_name: 'Иванов Иван Иванович',
-      id: 1,
-    },
-  ];
+  const [loading, setLoading] = useState<Loading>(defaultLoading);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
 
   const times: Time[] = [
     {
@@ -55,6 +61,26 @@ const Registration = () => {
       allowed: false,
     },
   ];
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      setLoading({ ...loading, doctors: true });
+      return new Promise((resolve) =>
+        setTimeout(() => {
+          setDoctors([
+            {
+              full_name: 'Иванов Иван Иванович',
+              id: 1,
+            },
+          ]);
+          setLoading({ ...loading, doctors: false });
+          resolve();
+        }, 4000),
+      );
+    };
+
+    fetchDoctors();
+  }, []);
 
   const { register, handleSubmit, errors, control } = useForm<IRegForm>({ defaultValues });
 
@@ -93,6 +119,7 @@ const Registration = () => {
                     getOptionSelected={(val, option) => val.id === option.id}
                     options={doctors}
                     getOptionLabel={(option) => option.full_name}
+                    loading={loading.doctors}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -132,6 +159,7 @@ const Registration = () => {
                     getOptionSelected={(val, option) => val.id === option.id}
                     options={times}
                     getOptionLabel={(option) => option.humanVariant}
+                    loading={loading.times}
                     getOptionDisabled={(option) => !option.allowed}
                     renderInput={(params) => (
                       <TextField
