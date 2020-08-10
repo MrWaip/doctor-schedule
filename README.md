@@ -8,7 +8,21 @@
 docker-compose up -d
 ```
 
-2. Нужно выполнить миграции БД и вызвать сиды
+2. Backend'у нужны зависимости
+
+```
+# в контейнере
+
+docker-compose exec backend npm i
+
+# в локально в ./backend/
+
+npm i
+
+yarn
+```
+
+3. Нужно выполнить миграции БД и вызвать сиды
 
 ```
 # Исполняем миграции
@@ -20,4 +34,4 @@ docker-compose exec backend npm run seed:run
 
 ```
 
-3. Проверять рузультат **http://localhost:3000**
+4. Проверять рузультат **http://localhost:3000**
