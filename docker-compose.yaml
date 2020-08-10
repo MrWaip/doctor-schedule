@@ -5,14 +5,14 @@ services:
     image: nginx:alpine
     restart: always
     volumes:
-      - ./dist:/var/www
+      - ./frontend/build:/var/www
       - ./nginx/conf.d/:/etc/nginx/conf.d/
     ports:
       - 3000:80
 
   backend:
-    image: node:alpine
-    restart: always
+    working_dir: /var/www
+    image: node:12
     volumes:
       - ./backend:/var/www
     ports:
@@ -21,6 +21,7 @@ services:
       - db
     depends_on:
       - db
+    command: node ./node_modules/ts-node/dist/bin.js ./src/index.ts
 
   db:
     image: postgres

@@ -1,7 +1,7 @@
 {
   "type": "postgres",
-  "host": "localhost",
-  "port": 7433,
+  "host": "db",
+  "port": 5432,
   "username": "admin",
   "password": "1234",
   "database": "med_db",

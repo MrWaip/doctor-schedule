@@ -19,8 +19,8 @@ createConnection()
     app.use(koaLogger());
     app.use(router.routes());
     app.use(router.allowedMethods());
-    app.listen(3080);
+    app.listen(3000);
 
-    console.log('Koa application is up and running on port 3080');
+    console.log('Koa application is up and running on port 3000');
   })
   .catch((error) => console.log(error));
