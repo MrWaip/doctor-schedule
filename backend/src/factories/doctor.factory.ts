@@ -3,8 +3,7 @@ import { define } from 'typeorm-seeding';
 import { Doctor } from '../entity/Doctor';
 
 define(Doctor, (faker: typeof Faker) => {
-  const name = faker.name.title();
   const doc = new Doctor();
-  doc.full_name = name;
+  doc.full_name = `${faker.name.firstName()} ${faker.name.lastName()}`;
   return doc;
 });
