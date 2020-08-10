@@ -31,6 +31,7 @@ export type Time = {
 export type Loading = {
   doctors: boolean;
   times: boolean;
+  register: boolean;
 };
 
 export type RegForm = {
