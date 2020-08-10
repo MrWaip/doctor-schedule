@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Card, CardContent, TextField, FormControl, Button } from '@material-ui/core';
+import { Typography, Card, CardContent, TextField, FormControl, Button, LinearProgress, Snackbar } from '@material-ui/core';
+import MuiAlert from '@material-ui/lab/Alert';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import '../styles/Registration.scss';
 import parse from 'autosuggest-highlight/parse';
@@ -18,26 +19,14 @@ const defaultValues: RegForm = {
 const defaultLoading: Loading = {
   doctors: false,
   times: false,
+  register: false,
 };
 
 const Registration = () => {
+  const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<Loading>(defaultLoading);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
-
-  const times: Time[] = [
-    {
-      id: 1,
-      start: 'iso-format',
-      humanVariant: '02.07.2020 9:00',
-      allowed: true,
-    },
-    {
-      id: 2,
-      start: 'iso-format',
-      humanVariant: '02.07.2020 9:30',
-      allowed: false,
-    },
-  ];
+  const [times, setTimes] = useState<Time[]>([]);
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -47,13 +36,32 @@ const Registration = () => {
       setDoctors(data);
     };
 
+    const fetchTimes = async () => {
+      setLoading({ ...loading, times: true });
+      const { data } = await client.get<Time[]>('times');
+      setLoading({ ...loading, times: false });
+      setTimes(data);
+    };
+
     fetchDoctors();
+    fetchTimes();
   }, []);
 
-  const { register, handleSubmit, errors, control } = useForm<RegForm>({ defaultValues });
+  const { register, handleSubmit, errors, control, reset } = useForm<RegForm>({ defaultValues });
 
   const onSubmit = async (data: RegForm) => {
+    setLoading({ ...loading, register: true });
     await client.post('schedule', data);
+    const newTimes = times.map((i) => {
+      if (i.id == data.time?.id) {
+        i.allowed = false;
+      }
+      return i;
+    });
+    setTimes(newTimes);
+    setLoading({ ...loading, register: false });
+    reset();
+    setOpen(true);
   };
 
   return (
@@ -62,6 +70,7 @@ const Registration = () => {
         Запись на прием
       </Typography>
       <Card className="reg">
+        {loading.register && <LinearProgress color="secondary" />}
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <FormControl fullWidth>
@@ -169,6 +178,11 @@ const Registration = () => {
           </form>
         </CardContent>
       </Card>
+      <Snackbar open={open} autoHideDuration={6000} onClose={() => setOpen(false)}>
+        <MuiAlert onClose={() => setOpen(false)} severity="success">
+          Вы успешно записались к врачу!
+        </MuiAlert>
+      </Snackbar>
     </>
   );
 };

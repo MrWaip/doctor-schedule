@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Typography,
   Button,
@@ -12,6 +12,8 @@ import {
   IconButton,
   TextField,
   Grid,
+  Snackbar,
+  LinearProgress,
 } from '@material-ui/core';
 import '../styles/Schedule.scss';
 import { Delete } from '@material-ui/icons';
@@ -19,6 +21,7 @@ import { useForm, Controller } from 'react-hook-form';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import MuiAlert from '@material-ui/lab/Alert';
 import { client } from '../plugins/axios';
 import { SearchForm, Date, Doctor, ScheduleRecord } from '../types';
 
@@ -28,39 +31,45 @@ const defaultValues: SearchForm = {
 };
 
 const Schedule = () => {
-  const results: ScheduleRecord[] = [
-    {
-      id: 1,
-      patient_name: 'TEST',
-      time: '12:30',
-      complaints: 'Болит жевот',
-      completed: true,
-    },
-  ];
-
   const { control, errors, handleSubmit } = useForm<SearchForm>({ defaultValues });
+  const [dates, setDates] = useState<Date[]>([]);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [results, setResults] = useState<ScheduleRecord[]>([]);
+  const [open, setOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const dates: Date[] = [
-    {
-      value: 'www',
-      humanVariant: 'wqweq',
-    },
-  ];
-  const doctors: Doctor[] = [
-    {
-      full_name: '222',
-      id: 1,
-    },
-  ];
-
-  const search = async (data: SearchForm) => {
-    await client.get('schedule', {
-      params: {
-        date: data.date?.value,
-        doctor: data.doctor?.id,
-      },
+  const search = async (payload: SearchForm) => {
+    setLoading(true);
+    const { data } = await client.get<ScheduleRecord[]>('schedule', {
+      params: { date: payload.date?.value, doctor: payload.doctor?.id },
     });
+    setResults(data);
+    setLoading(false);
   };
+
+  const deleteSchedule = async (id: number) => {
+    setLoading(true);
+    await client.delete(`schedule/${id}`);
+    setLoading(false);
+    const newResults = results.filter((i) => i.id != id);
+    setResults(newResults);
+    setOpen(true);
+  };
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      const { data } = await client.get<Doctor[]>('doctors');
+      setDoctors(data);
+    };
+
+    const fetchDates = async () => {
+      const { data } = await client.get<Date[]>('dates');
+      setDates(data);
+    };
+
+    fetchDoctors();
+    fetchDates();
+  }, []);
 
   return (
     <>
@@ -162,6 +171,7 @@ const Schedule = () => {
         </Grid>
       </form>
       <TableContainer className="schedule__table" component={Paper}>
+        {loading && <LinearProgress color="secondary" />}
         <Table>
           <TableHead>
             <TableRow>
@@ -180,7 +190,7 @@ const Schedule = () => {
                 <TableCell>{row.time}</TableCell>
                 <TableCell>{row.complaints}</TableCell>
                 <TableCell align="center">
-                  <IconButton>
+                  <IconButton onClick={() => deleteSchedule(row.id)}>
                     <Delete />
                   </IconButton>
                 </TableCell>
@@ -189,6 +199,11 @@ const Schedule = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <Snackbar open={open} autoHideDuration={6000} onClose={() => setOpen(false)}>
+        <MuiAlert onClose={() => setOpen(false)} severity="success">
+          Вы успешно записались к врачу!
+        </MuiAlert>
+      </Snackbar>
     </>
   );
 };
